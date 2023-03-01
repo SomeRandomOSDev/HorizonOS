@@ -3,7 +3,7 @@
 void initMem()
 {
 	struct MemHeader* firstBlock = (struct MemHeader*)RAM_BEGIN;
-	firstBlock->size = 512;  // 512 bytes
+	firstBlock->size = RAM_SIZE; // 512 bytes
 	firstBlock->free = true;
 	firstBlock->lastBlock = true;
 }

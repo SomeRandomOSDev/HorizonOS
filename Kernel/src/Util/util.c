@@ -87,7 +87,7 @@ char getc()
 {
 	char c = 0;
 	while(c == 0)
-		c = GetChar(kbFormat);
+		c = GetChar(kb_Format);
 	return c;
 }
 
@@ -106,8 +106,8 @@ char* gets(uint16_t MAX_STR_SIZE)
 
 	while(c != '\n' || i == 0)
 	{
-		c = GetChar(kbFormat);
-		if(timer <= pitTimer || (lastC != c && lastC != ShiftChar(kbFormat, c)))
+		c = GetChar(kb_Format);
+		if(timer <= pitTimer || (lastC != c && lastC != ShiftChar(kb_Format, c)))
 		{
 			if(c != 0)
 			{
@@ -223,8 +223,14 @@ void printf(char* format, ...)
 				}
 			case 'B':
 				{
+				caseB:
 					puts(*arg ? "true" : "false");
 					arg ++;
+					break;
+				}
+			case 'b':
+				{
+					goto caseB;
 					break;
 				}
 			case '%':
@@ -249,12 +255,13 @@ int32_t atoi(char* str)
 	bool negative = false;
 	if(str[0] == '-')
 		negative = true;
+	int i = 0;
+	if(str[0] == '+')
+		i++;
 	if(negative)
-		str++;
+		i++;
 
 	int32_t r = 0;
-
-	int i = 0;
 
 	while(str[i] >= '0' && str[i] <= '9') 
 	{
@@ -488,7 +495,6 @@ char* uintToStr(uint32_t nb)
 }
 
 uint32_t next = 1;
- 
 uint32_t rand()
 {
     next = next * 1103515245 + 12345;
@@ -512,14 +518,14 @@ void Shutdown()
 	APMSetPowerStateOff();
 }
 
-uint8_t getDaysInMonth(uint8_t month, bool leapYear)
+uint8_t getDaysInMonth(int8_t month, bool leapYear)
 {
 	if(month == 1)
 		return 28 + leapYear;
-	return month >= 7 ? month % 2 : (month + 1) % 2;
+	return 30 + (month >= 7 ? month % 2 : (month + 1) % 2);
 }
 
-void TimeConvert(uint8_t* year, uint8_t* month, uint8_t* dayOfMonth, uint8_t* hours, uint8_t* minutes, uint8_t* seconds)
+void TimeConvert(int8_t* year, int8_t* month, int8_t* dayOfMonth, int8_t* hours, int8_t* minutes, int8_t* seconds)
 {
 	while(*seconds >= 60)
 	{
@@ -534,9 +540,9 @@ void TimeConvert(uint8_t* year, uint8_t* month, uint8_t* dayOfMonth, uint8_t* ho
 	while(*hours >= 24)
 	{
 		(*dayOfMonth)++;
-		*hours -= 23;
+		*hours -= 24;
 	}
-	uint8_t daysInMonth = getDaysInMonth(*month, (*year / 4 == *year / 4.));
+	uint8_t daysInMonth = getDaysInMonth((*month) - 1, (*year / 4 == *year / 4.));
 	while(*dayOfMonth - 1 >= daysInMonth)
 	{
 		(*month)++;
@@ -550,5 +556,37 @@ void TimeConvert(uint8_t* year, uint8_t* month, uint8_t* dayOfMonth, uint8_t* ho
 	while(*year >= 100)
 	{
 		*year -= 100;
+	}
+
+////////////////////////////////////////////////////////////
+
+	while(*seconds < 0)
+	{
+		(*minutes)--;
+		*seconds += 60;
+	}
+	while(*minutes < 0)
+	{
+		(*hours)--;
+		*minutes += 60;
+	}
+	while(*hours < 0)
+	{
+		(*dayOfMonth)--;
+		*hours += 24;
+	}
+	while(*dayOfMonth < 1)
+	{
+		(*month)--;
+		*dayOfMonth += daysInMonth;
+	}
+	while(*month < 1)
+	{
+		(*year)--;
+		*month += 12;
+	}
+	while(*year < 0)
+	{
+		*year += 100;
 	}
 }

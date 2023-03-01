@@ -25,13 +25,13 @@ struct IDTRegisters
 } __attribute__((packed));
 
 uint16_t cursor = 0;
-uint32_t vMem = 0;
 
 #define KB 1024
 #define MB (1024 * KB)
 #define GB (1024 * MB)
 #define TB (1024 * GB)
 #define PB (1024 * TB)
+#define EB (1024 * PB)
 
 #define TAB_LENGTH      4
 #define PIT_SPEED       100 // Hz
@@ -42,23 +42,24 @@ uint32_t pitTimer;
 bool kb_extendedScancode = false,
      kb_capsLock = false, kb_numLock = false, kb_scrollLock = false;
 
-#define KB_FORMAT         uint8_t
+typedef uint8_t           KB_FORMAT;
 #define KB_FORMAT_QWERTY  0
 #define KB_FORMAT_AZERTY  1
 
-KB_FORMAT kbFormat;
+KB_FORMAT kb_Format;
 
-uint8_t time_second;
-uint8_t time_minute;
-uint8_t time_hour;
-uint8_t time_weekday;
-uint8_t time_dayOfMonth;
-uint8_t time_month;
-uint8_t time_year;
+int8_t time_second;
+int8_t time_minute;
+int8_t time_hour;
+int8_t time_weekday;
+int8_t time_dayOfMonth;
+int8_t time_month;
+int8_t time_year;
 uint8_t time_timeMode;
 bool time_hourFormat;
 bool time_timeBinary;
 int time_timeZone;
+
 uint8_t apmVersionMajor;
 uint8_t apmVersionMinor;
 bool firstBoot;
@@ -123,8 +124,8 @@ extern void init(uint16_t BCDApmVersion)
 
 	updateCursor();
 
-	kbFormat = KB_FORMAT_AZERTY;
-	//kbFormat = KB_FORMAT_QWERTY;
+	kb_Format = KB_FORMAT_AZERTY;
+	//kb_Format = KB_FORMAT_QWERTY;
 
 	// GDTInstall();  // Init GDT
 
@@ -147,7 +148,6 @@ extern void init(uint16_t BCDApmVersion)
 
 void init2()
 {
-	vMem = 0xb8000;
 /* 	InitPaging();
 
 	InitPage0();
@@ -167,8 +167,6 @@ void init2()
 
 	while(true);*/
 
-	InitParallel();
-
 	puts("Detecting memory...\n");
 
 	EBDAAddress = (uint32_t)(*(uint16_t*)0x40e) << 4;
@@ -179,6 +177,8 @@ void init2()
 	printf("EBDA adress : 0x%x\n", EBDAAddress);
 
 	puts("Initialysing keyboard...\n");
+
+	InitKeyboard();
 
 	if(!ResetKeyboard())
 	{
@@ -193,8 +193,8 @@ void init2()
 		SetScancodeSet(2);
 	}
 
-	printf("ATA Slave Drive Identify :  %xh (%s)\n", ATAIdentify(ATA_DISK_SLAVE), (ATAIdentify(ATA_DISK_SLAVE) == 0 ? "Disconnected" : "Connected"));
-	printf("ATA Master Drive Identify : %xh (%s)\n", ATAIdentify(ATA_DISK_SLAVE), (ATAIdentify(ATA_DISK_MASTER) == 0 ? "Disconnected" : "Connected"));
+	printf("PATA Slave Drive Identify :  %xh (%s)\n", ATAIdentify(ATA_DISK_SLAVE), (ATAIdentify(ATA_DISK_SLAVE) == 0 ? "Disconnected" : "Connected"));
+	printf("PATA Master Drive Identify : %xh (%s)\n", ATAIdentify(ATA_DISK_SLAVE), (ATAIdentify(ATA_DISK_MASTER) == 0 ? "Disconnected" : "Connected"));
 
 	updateCursor();
 
@@ -270,12 +270,11 @@ void kernelMain()
 		printf("Choose your time zone : UTC + ");
 		updateCursor();
 
-		char* timeZoneStr = gets(2 + 1);
+		char* timeZoneStr = gets(3 + 1);
 		time_timeZone = atoi(timeZoneStr);
 		free(timeZoneStr);
 
 		time_hour += time_timeZone;
-
 		TimeConvertCurrent();
 
 		printf("It is %u:%u\n", time_hour, time_minute);
@@ -283,7 +282,6 @@ void kernelMain()
 		printf("Choose a username : ");
 
 		updateCursor();
-		ShowCursor(true, 0x0f, 0x0f);
 
 		char* userNameStr = gets(25);
 
@@ -295,12 +293,6 @@ void kernelMain()
 
 		updateCursor();
 
-		while(true)
-		{
-			printf("\nGetKeyState '&' : %B", GetKeyState(kbFormat, '&'));
-			updateCursor();
-		}
-
-		//Shutdown();
+		Shutdown();
 	}
 }

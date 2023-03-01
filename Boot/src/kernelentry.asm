@@ -38,9 +38,10 @@ pmEntry:
 
     call init
 
+    add esp, 4
+
     cli
     hlt
-    [bits 16]
 
 kernelEntry:
     [bits 16]
@@ -51,12 +52,8 @@ kernelEntry:
 	call APMSetDriverVersion1_1
     call APMEnable
 
-	cli 
+	cli
 	call EnableProtectedMode
-
-	; mov ah, 0x0f
-	; mov al, 'A'
-	; mov [0xb8000], ax
 
 	jmp dword GDT_CODE_SEG_32:pmEntry
 

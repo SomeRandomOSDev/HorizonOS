@@ -95,19 +95,22 @@ uint16_t keyboardLookupAZERTYSet2[128] =
 
 bool keyboardLookupState[128] = 
 {
-	false, false, false, false, false, false, false, false, false, false, 
-	false, false, false, false, false, false, false, false, false, false, 
-	false, false, false, false, false, false, false, false, false, false, 
-	false, false, false, false, false, false, false, false, false, false, 
-	false, false, false, false, false, false, false, false, false, false, 
-	false, false, false, false, false, false, false, false, false, false, 
-	false, false, false, false, false, false, false, false, false, false, 
-	false, false, false, false, false, false, false, false, false, false, 
-	false, false, false, false, false, false, false, false, false, false, 
-	false, false, false, false, false, false, false, false, false, false, 
-	false, false, false, false, false, false, false, false, false, false, 
-	false, false, false, false, false, false, false, false, false, false, 
-	false, false, false, false, false, false, false, false
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    /*false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false*/
 };
 
 uint16_t KeyboardLookup(KB_FORMAT format, uint8_t key);
@@ -124,3 +127,9 @@ bool ResetKeyboard();
 void SetScancodeSet(uint8_t set);
 uint8_t GetScancodeSet();
 void KeyboardHandler(struct IDTRegisters* reg);
+
+void InitKeyboard()
+{
+    for(uint8_t i = 0; i < 128; i++)
+        keyboardLookupState[i] = false;
+}

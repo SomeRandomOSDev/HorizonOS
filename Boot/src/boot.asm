@@ -1,16 +1,16 @@
 [bits 16]
 [org 0x7c00]
 
-ENDLINE        equ 0x0a
-CARRIAGE_RET   equ 0x0d
-%define NEWLINE ENDLINE, CARRIAGE_RET
-VGA_TEXT_80x25_16_COLORS equ 0x03
+ENDLINE                    equ 0x0a
+CARRIAGE_RET               equ 0x0d
+%define NEWLINE            ENDLINE, CARRIAGE_RET
+VGA_TEXT_80x25_16_COLORS   equ 0x03
 
 section .text
 global _start
 
 ; FAT Header
-jmp short _start
+jmp short _start     ; db 0xeb, 0x3c, 0x90
 nop
 oemIdentifier:       db "MSWIN4.1"    ; Oem identifier
 bytesperSector:      dw 512           ; Bytes per sector
@@ -35,8 +35,6 @@ volumeLabel:         db "HorizonOS  " ; Volume label
 sysID:               db "FAT12   "    ; System ID
 ; Extended FAT header
 
-db 0
-
 _start: ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Entry point
     sti
 
@@ -55,27 +53,16 @@ _start: ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Entry point
     mov al, VGA_TEXT_80x25_16_COLORS
     call SetVGAVideoMode
 
-    ; mov ah, 0x0e
-    ; mov al, 'W'
-    ; int 0x10
-
-    ; mov ax, 0xb800
-    ; mov es, ax
-    ; mov ah, 0x07
-    ; mov al, 'W'
-    ; mov di, 0
-    ; mov [es:di], ax
-
-    ; mov [driveType], dl ; Drive number
-    mov [driveType], byte 0x0
+    mov [driveType], dl ; Drive number
+    ; mov [driveType], byte 0x0
 
     mov si, loadingText
     call puts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    mov ax, 0x07e0
+    mov ax, 0
     mov es, ax
-    mov bx, 0
+    mov bx, 0x7e00
     ; es:bx = 0x7e00
 
     ; ax = LBA
@@ -86,9 +73,9 @@ _start: ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Entry point
 
     push ax
 
-    mov ax, 0x07e0
+    mov ax, 0
     mov es, ax
-    mov bx, 0
+    mov bx, 0x7e00
     
     mov ax, [rootDirEntries]
     mov dx, 32
@@ -118,7 +105,7 @@ _start: ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Entry point
     ; inc di
     ; mov [es:di], byte 0xfe
 
-    jmp 0x07e0:0x0000
+    jmp 0x0000:0x7e00
 
 ; // input
 ; ; al = mode

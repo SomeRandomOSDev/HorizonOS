@@ -6,7 +6,6 @@ EnableProtectedMode:
 	mov eax, cr0
 	or eax, PROTECTED_MODE_ENABLE_FLAG
 	mov cr0, eax
-	[bits 32]
 	ret
 
 global DisableProtectedMode

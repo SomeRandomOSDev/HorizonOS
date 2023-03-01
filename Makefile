@@ -1,4 +1,4 @@
-# cd "/mnt/c/Users/PC/Desktop/OS/HorizonOS (32bit)"
+# cd "/mnt/c/Users/PC/Desktop/OS/HorizonOS"
 # objdump -D -Mintel,data16 --adjust-vma=0x7c00 -b binary -m i386 boot.bin
 # mdir -i "horizonos.bin"
 # wc -l *.c *.h *.asm

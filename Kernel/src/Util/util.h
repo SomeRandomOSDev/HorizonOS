@@ -35,8 +35,8 @@ uint32_t rand();
 void srand(uint32_t seed);
 void Reboot();
 void Shutdown();
-uint8_t getDaysInMonth(uint8_t month, bool leapYear);
-void TimeConvert(uint8_t* year, uint8_t* month, uint8_t* dayOfMonth, uint8_t* hours, uint8_t* minutes, uint8_t* seconds);
+uint8_t getDaysInMonth(int8_t month, bool leapYear);
+void TimeConvert(int8_t* year, int8_t* month, int8_t* dayOfMonth, int8_t* hours, int8_t* minutes, int8_t* seconds);
 
 #define max(nb0, nb1) ((nb0 > nb1) ? nb0 : nb1)
 #define min(nb0, nb1) ((nb0 < nb1) ? nb0 : nb1)

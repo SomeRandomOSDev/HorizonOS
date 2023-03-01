@@ -302,7 +302,7 @@ uint8_t GetScancodeSet()
 void KeyboardHandler(struct IDTRegisters* reg)
 {
     uint8_t scancode = inb(PS2_DATA_PORT);
-    uint16_t key = KeyboardLookup(kbFormat, scancode);
+    uint16_t key = KeyboardLookup(kb_Format, scancode);
 
     if(scancode == 0xe0)
     {
