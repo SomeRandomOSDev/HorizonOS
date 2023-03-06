@@ -48,6 +48,8 @@ pmEntry:
 
 kernelEntry:
     [bits 16]
+
+    lgdt [GDT_Ptr]
     
 	call APMGetVersion
 	push ax
@@ -62,6 +64,47 @@ kernelEntry:
 	call EnableProtectedMode
 
 	jmp dword GDT_CODE_SEG_32:pmEntry
+
+GDT_Begin:
+    GDT_NULL:
+        dq 0x0
+
+    GDT_CODE_32:
+        dw 0xffff
+        dw 0x0
+        db 0x0
+        db 0b10011010
+        db 0b11001111
+        db 0x0
+
+    GDT_DATA_32:
+        dw 0xffff
+        dw 0x0
+        db 0x0
+        db 0b10010010
+        db 0b11001111
+        db 0x0
+
+    GDT_CODE_16:
+        dw 0xffff
+        dw 0x0
+        db 0x0
+        db 0b10011010
+        db 0b00001111
+        db 0x0
+
+    GDT_DATA_16:
+        dw 0xffff
+        dw 0x0
+        db 0x0
+        db 0b10010010
+        db 0b00001111
+        db 0x0
+GDT_End:
+
+GDT_Ptr:
+    dw GDT_End - GDT_Begin - 1
+    dd GDT_Begin
 
 ; %include "apm.asm"
 ; %include "pm.asm"

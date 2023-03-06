@@ -236,9 +236,16 @@ void init2()
 
 	// Halt();
 
-	ClearScreenText(FG_WHITE | BG_BLACK);
-	cursor = 0;
+	ClearScreen();
+
+	printf("Scanning PCI Buses...\n\n");
+	PCI_ScanBuses();
+
 	updateCursor();
+
+	// Halt();
+
+	ClearScreen();
 
 	kernelMain();
 }

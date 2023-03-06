@@ -8,8 +8,9 @@ horizonos.bin: Boot/bin/boot.bin Kernel/bin/kernel.bin Makefile
 	mkfs.fat -F 12 -n "HORIZONOS" "horizonos.bin"
 	dd if="Boot/bin/boot.bin" of="horizonos.bin" conv=notrunc
 
-	mcopy -i "horizonos.bin" "Files/System" "::System"
-	mcopy -i "horizonos.bin" "Kernel/bin/kernel.bin" "::System/kernel.bin"
+	# mcopy -i "horizonos.bin" "Files/System" "::Sys32"
+	# mcopy -i "horizonos.bin" "Kernel/bin/kernel.bin" "::Sys32/kernel.bin"
+	mcopy -i "horizonos.bin" "Kernel/bin/kernel.bin" "::kernel.bin"
 	mcopy -i "horizonos.bin" "test.txt" "::test.txt"
 
 Kernel/bin/kernel.bin: Kernel/src/kernel.c Boot/bin/boot.bin Kernel/src/Util/* Kernel/src/Drivers/PS2/* Kernel/src/Drivers/* Kernel/src/Drivers/ATA/* Kernel/src/Drivers/Sound/* Makefile

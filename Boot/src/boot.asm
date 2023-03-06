@@ -14,7 +14,7 @@ jmp short _start     ; db 0xeb, 0x3c, 0x90
 nop
 oemIdentifier:       db "MSWIN4.1"    ; Oem identifier
 bytesperSector:      dw 512           ; Bytes per sector
-sectorsPerCluster:   db 1             ; Sectors per cluster
+sectorsPerCluster:   db 4             ; Sectors per cluster
 reservedSectors:     dw 1             ; Reserved sectors
 fatCount:            db 2             ; FAT count
 rootDirEntries:      dw 224           ; Root dir entries count
@@ -75,7 +75,6 @@ _start: ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Entry point
 
     mov ax, 0
     mov es, ax
-    mov bx, 0x7e00
 
     mov ax, [rootDirEntries]
     mov dx, 32
@@ -86,17 +85,20 @@ _start: ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Entry point
     pop cx
     add ax, cx
 
-    add ax, 1
+    ; mov bl, byte [sectorsPerCluster]
+    ; mov bh, 0
+
+    ; add ax, bx
 
     mov cl, 0x40
     mov dl, byte [driveType]
+
+    mov bx, 0x7e00
     call ReadDisk
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     mov si, diskReadText
     call puts
-
-    lgdt [GDT_Ptr]
 
     ; mov ax, 0x07e0
     ; mov es, ax
@@ -105,7 +107,7 @@ _start: ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Entry point
     ; inc di
     ; mov [es:di], byte 0xfe
 
-    jmp 0x0000:0x7e00
+    jmp 0x7e00
 
 ; // input
 ; ; al = mode
@@ -233,47 +235,6 @@ ReadDisk:
     popa
 
     ret
-
-GDT_Begin:
-    GDT_NULL:
-        dq 0x0
-
-    GDT_CODE_32:
-        dw 0xffff
-        dw 0x0
-        db 0x0
-        db 0b10011010
-        db 0b11001111
-        db 0x0
-
-    GDT_DATA_32:
-        dw 0xffff
-        dw 0x0
-        db 0x0
-        db 0b10010010
-        db 0b11001111
-        db 0x0
-
-    GDT_CODE_16:
-        dw 0xffff
-        dw 0x0
-        db 0x0
-        db 0b10011010
-        db 0b00001111
-        db 0x0
-
-    GDT_DATA_16:
-        dw 0xffff
-        dw 0x0
-        db 0x0
-        db 0b10010010
-        db 0b00001111
-        db 0x0
-GDT_End:
-
-GDT_Ptr:
-    dw GDT_End - GDT_Begin - 1
-    dd GDT_Begin
 
 loadingText:           db "Loading kernel...", NEWLINE, 0
 driveResetErrorText:   db "Error while resetting disk.", NEWLINE, 0

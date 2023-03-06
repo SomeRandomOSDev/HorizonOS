@@ -44,9 +44,11 @@ void TimeConvert(int8_t* year, int8_t* month, int8_t* dayOfMonth, int8_t* hours,
 #define RAND_MAX 32767
 #define time(x) (year + month + dayOfMonth + weekday + hours + minutes + seconds + pitTimer - x)
 #define TimeConvertCurrent() TimeConvert(&time_year, &time_month, &time_dayOfMonth, &time_hour, &time_minute, &time_second)
-
 #define Halt() DisableInterrupts(); \
 			   asm("hlt")
+#define ClearScreen() ClearScreenText(FG_WHITE | BG_BLACK); \
+					  cursor = 0; \
+					  updateCursor();
 
 #define FG_BLACK    0x00
 #define FG_BLUE     0x01
