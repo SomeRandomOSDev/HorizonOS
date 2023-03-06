@@ -3,27 +3,50 @@
 #define PCI_CONFIG_ADDRESS  0xcf8
 #define PCI_CONFIG_DATA     0xcfc
 
-uint16_t PCIReadWord(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) 
-{
-    uint32_t address;
-    uint32_t lbus = bus;
-    uint32_t lslot = slot;
-    uint32_t lfunc = func;
-    uint16_t tmp = 0;
+void PCI_CAMSelectRegister(uint8_t bus, uint8_t slot, uint8_t func, uint8_t reg) 
+{ 
+    uint32_t address = (0x80000000
+    | (bus << 16)
+    | (slot << 11)
+    | (func << 8)
+    | (reg * 4));
  
-    address = (uint32_t)((lbus << 16) | (lslot << 11) | (lfunc << 8) | (offset & 0xfc) | 0x80000000);
- 
-    outd(address, CONFIG_ADDRESS);
-
-    tmp = (uint16_t)((ind(CONFIG_DATA) >> ((offset & 2) * 8)) & 0xffff);
-    return tmp;
+    outd(PCI_CONFIG_ADDRESS, address);
 }
 
-uint16_t PCICheckVendor(uint8_t bus, uint8_t slot) 
+uint32_t PCI_CAMReadSelected32() 
+{ 
+    return ind(PCI_CONFIG_DATA);
+}
+
+uint32_t PCI_CAMRead32(uint8_t bus, uint8_t slot, uint8_t func, uint8_t reg) 
+{ 
+    PCI_CAMSelectRegister(bus, slot, func, reg);
+    return ind(PCI_CONFIG_DATA);
+}
+
+void PCI_CheckDevice(uint8_t bus, uint8_t device, uint8_t* functions) 
 {
-    uint16_t vendor, device;
-    vendor = pciConfigReadWord(bus, slot, 0, 0);
-    if(vendor != 0xffff) 
-        device = pciConfigReadWord(bus, slot, 0, 2);
-    return vendor;
+    uint8_t function = 0;
+
+    functions = 0;
+ 
+    if((PCI_CAMRead32(bus, device, function, 0) & 0xffff) == 0xffff) 
+        return;
+
+    functions = 1;
+
+    // checkFunction(bus, device, function);
+    uint8_t headerType = (PCI_CAMRead32(bus, device, function, 3) >> 16);
+    if(!(headerType >> 7)) 
+    {
+        for(function = 1; function < 8; function++) 
+        {
+            if((PCI_CAMRead32(bus, device, function, 0) & 0xffff) != 0xffff) 
+            {
+                // checkFunction(bus, device, function);
+                functions++;
+            }
+        }
+    }
 }

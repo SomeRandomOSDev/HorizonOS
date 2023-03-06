@@ -237,7 +237,7 @@ char KeypadNumberToASCII(uint16_t key)
 
 char GetChar(KB_FORMAT format)
 {
-	char c = 0;
+	uint16_t c = 0;
 	for(uint8_t i = 0; i < 128; i++)
 	{
 		uint16_t currC = KeyboardLookup(format, i);

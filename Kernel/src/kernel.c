@@ -1,20 +1,4 @@
-#define NULL ((void*) 0)
-
-typedef signed char			int8_t;
-typedef unsigned char		uint8_t;
-typedef short				int16_t;
-typedef unsigned short		uint16_t;
-typedef int		    		int32_t;
-typedef unsigned			uint32_t;
-typedef long long			int64_t;
-typedef unsigned long long	uint64_t;
-
-typedef long unsigned int   size_t;
-typedef unsigned int        uintptr_t;
-
-typedef uint8_t             bool;
-#define true      			1
-#define false   		    0
+#include "Util/defs.h"
 
 struct IDTRegisters
 {
@@ -64,6 +48,9 @@ uint8_t apmVersionMajor;
 uint8_t apmVersionMinor;
 bool firstBoot;
 
+#define HOURS_24 1
+#define HOURS_12 0
+
 void init2();
 void kernelMain();
 
@@ -96,14 +83,13 @@ void KeyboardHandler(struct IDTRegisters* reg);
 #include "Drivers/PS2/keyboard.c"
 #include "Util/memory.c"
 
-#define HOURS_24 1
-#define HOURS_12 0
-	
+#include "Drivers/pci.h"
+
 uint32_t EBDAAddress = 0;
 void* EBDA = NULL;
 
 extern void init(uint16_t BCDApmVersion)
-{	
+{
 	puts("\n\n");
 	cursor = 160 * 2;
 	initMem();
@@ -148,24 +134,24 @@ extern void init(uint16_t BCDApmVersion)
 
 void init2()
 {
-/* 	InitPaging();
+ 	// InitPaging();
 
-	InitPage0();
+	// InitPage0();
 
-	InitPage(page768, 768);
+	// InitPage(page768, 768);
 
-	loadPageDirectory(pageDir);
-	EnablePaging();
+	// loadPageDirectory(pageDir);
+	// EnablePaging();
 
-	uint8_t* ptr = (uint8_t*)0xa0000000;
+	// uint8_t* ptr = (uint8_t*)0xa0000000;
 
-	uint8_t val = *ptr;
-	if(val == 0);
+	// uint8_t val = *ptr;
+	// if(val == 0);
 
-	//isr14();
-	printf("Abcdef");
+	// //isr14();
+	// printf("Abcdef");
 
-	while(true);*/
+	// while(true);
 
 	puts("Detecting memory...\n");
 
@@ -184,7 +170,7 @@ void init2()
 	{
 		printstr("Error while initialysing keyboard...\n", (BG_BLACK | FG_LRED), &cursor);
 		printstr("Could not boot HorizonOS properly.", (BG_BLACK | FG_LRED), &cursor);
-		//ShowCursor(false, 0, 0);
+		// ShowCursor(false, 0, 0);
 		while(true);
 	}
 	else
@@ -248,7 +234,7 @@ void init2()
 
 	updateCursor();
 
-	//Halt();
+	// Halt();
 
 	ClearScreenText(FG_WHITE | BG_BLACK);
 	cursor = 0;
@@ -292,7 +278,5 @@ void kernelMain()
 		putc('\n');
 
 		updateCursor();
-
-		Shutdown();
 	}
 }

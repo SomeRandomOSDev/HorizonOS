@@ -76,7 +76,7 @@ _start: ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Entry point
     mov ax, 0
     mov es, ax
     mov bx, 0x7e00
-    
+
     mov ax, [rootDirEntries]
     mov dx, 32
     mul dx

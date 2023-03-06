@@ -1,0 +1,1 @@
+find "." -type f -name '*.c' -o -name '*.h' -o -name '*.asm' -o -name '*.S' | xargs wc -l | tail -1

@@ -9,6 +9,8 @@
 [extern APMEnable]
 [extern APMSetPowerStateOff]
 
+[extern PCIIsSupported]
+
 section .text
 
 GDT_CODE_SEG_32 equ 0x08
@@ -22,7 +24,8 @@ pmEntry:
     [bits 32]
 
     pop ax
-    mov bx, ax
+    and eax, 0xffff
+    mov ebx, eax
 
     mov ax, GDT_DATA_SEG_32
     mov ds, ax
@@ -51,6 +54,9 @@ kernelEntry:
 	call APMConnect32bitPM
 	call APMSetDriverVersion1_1
     call APMEnable
+
+    ; call PCIIsSupported
+    ; push ax
 
 	cli
 	call EnableProtectedMode
