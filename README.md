@@ -12,7 +12,9 @@ Ressources I used to learn OS Development :
  
 ## Features 
 
-- PS/2 Keyboard Driver
+- Interrupt Handlers
+	- Timer
+	- PS/2 Keyboard Driver
 - Parallel Ports Driver
 - APM Support
 - Memory Manager
