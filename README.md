@@ -10,18 +10,19 @@ Ressources I used to learn OS Development :
  
 ## Features 
 
-- PS/2 Keyboard driver
-- Parallel ports driver
+- PS/2 Keyboard Driver
+- Parallel Ports Driver
 - APM Support
 - Memory Manager
+- PCI Bus Enumeration
 
 ### To come
 
-- FAT32 File system support
-- Serial ports driver
-- USB Ports driver
-- VESA Video modes support
-- ACPI Driver
+- FAT16/32 File System Support
+- Serial Ports Driver
+- USB Ports Driver
+- VESA Video Modes Support
+- ACPI Driver (maybe)
 - Paging
 - Physical Address Extension
 - Multiprocessing
@@ -29,4 +30,4 @@ Ressources I used to learn OS Development :
 ### WIP
 
 - ATA Drivers
-- FAT12 File system support
+- FAT12 File System Support

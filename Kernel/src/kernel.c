@@ -243,7 +243,7 @@ void init2()
 
 	updateCursor();
 
-	Halt();
+	// Halt();
 
 	ClearScreen();
 
