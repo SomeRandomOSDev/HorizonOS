@@ -28,7 +28,7 @@ uint32_t PCI_CAMRead32(uint8_t bus, uint8_t slot, uint8_t func, uint8_t reg)
     return ind(PCI_CONFIG_DATA);
 }
 
-void PCI_CheckDevice(uint8_t bus, uint8_t device, uint8_t fonction, uint8_t* functions, uint16_t* deviceId, uint16_t* vendorId, uint16_t* classCode, uint8_t* headerType) 
+void PCI_CheckDevice(uint8_t bus, uint8_t device, uint8_t fonction, uint8_t* functions, uint16_t* deviceId, uint16_t* vendorId, uint16_t* classCode, uint8_t* headerTypeReg, uint16_t* subVendorId, uint16_t* subDeviceId) 
 {
     *deviceId = (PCI_CAMRead32(bus, device, fonction, 0) >> 16);
     *vendorId = (PCI_CAMRead32(bus, device, fonction, 0) & 0xffff);
@@ -42,7 +42,25 @@ void PCI_CheckDevice(uint8_t bus, uint8_t device, uint8_t fonction, uint8_t* fun
 
     *functions = 1;
 
-    *headerType = (PCI_CAMRead32(bus, device, fonction, 3) >> 16);
+    *headerTypeReg = (PCI_CAMRead32(bus, device, fonction, 3) >> 16);
+
+    uint8_t headerType = (*headerTypeReg) & 0b01111111;
+
+    if(headerType == 2)
+    {
+        *subVendorId = (PCI_CAMRead32(bus, device, fonction, 0x10) >> 16);
+        *subDeviceId = PCI_CAMRead32(bus, device, fonction, 0x10);
+    }
+    else if(headerType == 0)
+    {
+        *subDeviceId = (PCI_CAMRead32(bus, device, fonction, 0xb) >> 16);
+        *subVendorId = PCI_CAMRead32(bus, device, fonction, 0xb);
+    }
+    else 
+    {
+        *subVendorId = 0;
+        *subDeviceId = 0;
+    }
 }
 
 void PCI_ScanBuses()
@@ -53,99 +71,111 @@ void PCI_ScanBuses()
 		{
             for(uint8_t k = 0; k < 8; k++)
             {
-                uint8_t func = 0, headerType;
-                uint16_t deviceId = 0, vendorId = 0, class = 0;
-                char* vendorStr = "", *classStr = "";
-                PCI_CheckDevice(i, j, k, &func, &deviceId, &vendorId, &class, &headerType);
-                switch(vendorId)
-                {
-                case 0x8086:
-                    vendorStr = "Intel Corporation";
-                    break;
-                default:
-                    vendorStr = "Unknown Vendor   ";
-                    break;
-                }
-                switch(class >> 8)
+                uint8_t func = 0, headerType = 0;
+                uint16_t deviceId = 0, vendorId = 0, pciClass = 0, subVendorId = 0, subDeviceId = 0;
+                char* classStr = "";
+                // char* deviceStr = "";
+                // char* vendorStr = "";
+                PCI_CheckDevice(i, j, k, &func, &deviceId, &vendorId, &pciClass, &headerType, &subVendorId, &subDeviceId);
+                // switch(vendorId)
+                // {
+                // case 0x1234:
+                //     vendorStr = "Technical Corp.";
+                //     // deviceStr = "QEMU Virtual Video Controller";
+                //     break;
+                // case 0x1414:
+                //     vendorStr = "Microsoft Corporation";
+                //     break;
+                // case 0x1af4:
+                //     vendorStr = "Red Hat, Inc.";
+                //     break;
+                // case 0x8086:
+                //     vendorStr = "Intel Corporation";
+                //     break;
+                // default:
+                //     vendorStr = "Unknown Vendor";
+                //     break;
+                // }
+                switch(pciClass >> 8)
                 {
                 case 0:
-                    classStr = "Unclassified Device";
+                    classStr = "Unclassified Device               ";
                     break;
                 case 1:
-                    classStr = "Mass Storage Controller";
+                    classStr = "Mass Storage Controller           ";
                     break;
                 case 2:
-                    classStr = "Network Controller";
+                    classStr = "Network Controller                ";
                     break;
                 case 3:
-                    classStr = "Display Controller";
+                    classStr = "Display Controller                ";
                     break;
                 case 4:
-                    classStr = "Multimedia Controller";
+                    classStr = "Multimedia Controller             ";
                     break;
                 case 5:
-                    classStr = "Memory Controller";
+                    classStr = "Memory Controller                 ";
                     break;
                 case 6:
-                    classStr = "Bridge";
+                    classStr = "Bridge                            ";
                     break;
                 case 7:
-                    classStr = "Simple Communication Controller";
+                    classStr = "Simple Communication Controller   ";
                     break;
                 case 8:
-                    classStr = "Base System Peripheral";
+                    classStr = "Base System Peripheral            ";
                     break;
                 case 9:
-                    classStr = "Input Device Controller";
+                    classStr = "Input Device Controller           ";
                     break;
                 case 0xa:
-                    classStr = "Docking Station";
+                    classStr = "Docking Station                   ";
                     break;
                 case 0xb:
-                    classStr = "Processor";
+                    classStr = "Processor                         ";
                     break;
                 case 0xc:
-                    classStr = "Serial Bus Controller";
+                    classStr = "Serial Bus Controller             ";
                     break;
                 case 0xd:
-                    classStr = "Wireless Controller";
+                    classStr = "Wireless Controller               ";
                     break;
                 case 0xe:
-                    classStr = "Intelligent Controller";
+                    classStr = "Intelligent Controller            ";
                     break;
                 case 0xf:
                     classStr = "Satellite Communication Controller";
                     break;
                 case 0x10:
-                    classStr = "Encryption Controller";
+                    classStr = "Encryption Controller             ";
                     break;
                 case 0x11:
-                    classStr = "Signal Processing Controller";
+                    classStr = "Signal Processing Controller      ";
                     break;
                 case 0x12:
-                    classStr = "Processing Accelerator";
+                    classStr = "Processing Accelerator            ";
                     break;
                 case 0x13:
-                    classStr = "Non-Essential Instrumentation";
+                    classStr = "Non-Essential Instrumentation     ";
                     break;
                 case 0x14:
-                    classStr = "Reserved";
+                    classStr = "Reserved                          ";
                     break;
                 case 0x40:
-                    classStr = "Co-Processor";
+                    classStr = "Co-Processor                      ";
                     break;
                 case 0x41:
-                    classStr = "Reserved";
+                    classStr = "Reserved                          ";
                     break;
                 case 0xff:
-                    classStr = "Unassigned Class";
+                    classStr = "Unassigned Class                  ";
                     break;
                 default:
-                    classStr = "Unknown Class";
+                    classStr = "Unknown Class                     ";
                     break;
                 }
                 if(deviceId != 0xffff)
-                    printf("%x:%x.%x %x: %x:%x | %s | %s\n", i, j, k, class, vendorId, deviceId, vendorStr, classStr);
+                    printf("%x:%x.%x %x: %x:%x %x:%x | %s\n", i, j, k, pciClass, vendorId, deviceId, subVendorId, subDeviceId, classStr);
             }
 		}
 	}
