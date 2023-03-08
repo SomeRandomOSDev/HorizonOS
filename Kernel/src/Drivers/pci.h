@@ -9,10 +9,11 @@ void PCI_CAMSelectRegister(uint8_t bus, uint8_t slot, uint8_t func, uint8_t reg)
 { 
     uint32_t address = 
     ( ((uint32_t)1 << 31)
-    | (bus << 16)
-    | (slot << 11)
-    | (func << 8)
-    | (reg * 4));
+    | ((uint32_t)bus << 16)
+    | ((uint32_t)slot << 11)
+    | ((uint32_t)func << 8)
+    | ((uint32_t)reg * 4)
+    );
  
     outd(PCI_CONFIG_ADDRESS, address);
 }

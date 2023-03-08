@@ -8,8 +8,6 @@ struct IDTRegisters
     uint32_t eip, cs, eflags, userEsp, ss;
 } __attribute__((packed));
 
-uint16_t cursor = 0;
-
 #define KB 1024
 #define MB (1024 * KB)
 #define GB (1024 * MB)
@@ -91,7 +89,7 @@ void* EBDA = NULL;
 extern void init(uint16_t BCDApmVersion)
 {
 	puts("\n\n");
-	cursor = 160 * 2;
+	text_cursor = 80 * 2;
 	initMem();
 	ShowCursor(true, 0x0f, 0x0f); // Init cursor shape
 
@@ -99,8 +97,8 @@ extern void init(uint16_t BCDApmVersion)
 
 	if(BCDApmVersion == 0)
 	{
-		printstr("APM not supported...\n", (BG_BLACK | FG_LRED), &cursor);
-		printstr("Could not boot HorizonOS properly.", (BG_BLACK | FG_LRED), &cursor);
+		printstr("APM not supported...\n", (BG_BLACK | FG_LRED), &text_cursor);
+		printstr("Could not boot HorizonOS properly.", (BG_BLACK | FG_LRED), &text_cursor);
 		updateCursor();
 		while(true);
 	}
@@ -168,8 +166,8 @@ void init2()
 
 	if(!ResetKeyboard())
 	{
-		printstr("Error while initialysing keyboard...\n", (BG_BLACK | FG_LRED), &cursor);
-		printstr("Could not boot HorizonOS properly.", (BG_BLACK | FG_LRED), &cursor);
+		printstr("Error while initialysing keyboard...\n", (BG_BLACK | FG_LRED), &text_cursor);
+		printstr("Could not boot HorizonOS properly.", (BG_BLACK | FG_LRED), &text_cursor);
 		// ShowCursor(false, 0, 0);
 		while(true);
 	}

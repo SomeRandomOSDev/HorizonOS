@@ -168,20 +168,20 @@ extern void IDTHandler(struct IDTRegisters* r)
 	ClearScreenText(BG_BLUE);
 	if(r->int_no < 32)
 	{
-		uint16_t cursor = 2 * (80 + 2);
+		uint16_t cursor = (80 + 2);
 		printstr("FATAL EXCEPTION : ", (BG_BLUE | FG_LRED), &cursor);
 
-		endline(&cursor);
-		endline(&cursor);
-		cursor += 4;
+		text_endline(&cursor);
+		text_endline(&cursor);
+		cursor += 2;
 
 		printstr("Kernel panic : ", (BG_BLUE | FG_WHITE), &cursor);
 
 		char* exceptionStr = INTERRUPT_ERROR[r->int_no];
 		printstr(exceptionStr, (BG_BLUE | FG_WHITE), &cursor);
 
-		endline(&cursor);
-		endline(&cursor);
+		text_endline(&cursor);
+		text_endline(&cursor);
 
 		cursor += 4;
 
@@ -191,7 +191,7 @@ extern void IDTHandler(struct IDTRegisters* r)
 		printstr(exceptionNbStr, (BG_BLUE | FG_WHITE), &cursor);
 		free(exceptionNbStr);
 
-		endline(&cursor);
+		text_endline(&cursor);
 		cursor += 4;
 
 		printstr("Error code : ", (BG_BLUE | FG_WHITE), &cursor);

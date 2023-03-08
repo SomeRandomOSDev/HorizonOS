@@ -1,13 +1,15 @@
 #pragma once
 
+uint16_t text_cursor = 0;
+
 void EnableInterrupts(){asm("sti");}
 void DisableInterrupts(){asm("cli");}
 
 void ShowCursor(bool show, uint8_t startScanline/* = 0x0f*/, uint8_t endScanline/* = 0x0f*/);
 void SetCursorPos(uint16_t pos);
 void Sleep(uint32_t milliseconds);
-void endline(uint16_t* curs);
-void carriage(uint16_t* curs);
+void text_endline(uint16_t* curs);
+void text_carriage(uint16_t* curs);
 void putchar(char c, uint8_t color, uint16_t* curs);
 void putc(uint16_t c);
 bool kbhit();
@@ -40,14 +42,14 @@ void TimeConvert(int8_t* year, int8_t* month, int8_t* dayOfMonth, int8_t* hours,
 
 #define max(nb0, nb1) ((nb0 > nb1) ? nb0 : nb1)
 #define min(nb0, nb1) ((nb0 < nb1) ? nb0 : nb1)
-#define updateCursor() SetCursorPos(cursor / 2)
+#define updateCursor() SetCursorPos(text_cursor)
 #define RAND_MAX 32767
 #define time(x) (year + month + dayOfMonth + weekday + hours + minutes + seconds + pitTimer - x)
 #define TimeConvertCurrent() TimeConvert(&time_year, &time_month, &time_dayOfMonth, &time_hour, &time_minute, &time_second)
 #define Halt() DisableInterrupts(); \
 			   asm("hlt")
 #define ClearScreen() ClearScreenText(FG_WHITE | BG_BLACK); \
-					  cursor = 0; \
+					  text_cursor = 0; \
 					  updateCursor();
 
 #define FG_BLACK    0x00

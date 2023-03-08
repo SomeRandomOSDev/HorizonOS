@@ -31,28 +31,26 @@ void Sleep(uint32_t milliseconds)
 	while(timer + milliseconds > pitTimer);
 }
 
-void endline(uint16_t* curs)
+void text_endline(uint16_t* curs)
 {
-	*curs += 160;
-	uint32_t y = (*curs / 160);
-	*curs = y * 160;
+	*curs += 80;
+	text_carriage(curs);
 }
 
-void carriage(uint16_t* curs)
+void text_carriage(uint16_t* curs)
 {
-	uint32_t y = (*curs / 160);
-	*curs = y * 160;
+	*curs = (*curs / 80) * 80;
 }
 
 void putchar(char c, uint8_t color, uint16_t* curs)
 {
 	if(c == '\n')
 	{
-		endline(curs);
+		text_endline(curs);
 	}
 	else if(c== '\r')
 	{
-		carriage(curs);
+		text_carriage(curs);
 	}
 	else if(c == '\t')
 	{
@@ -63,16 +61,16 @@ void putchar(char c, uint8_t color, uint16_t* curs)
 	}
 	else
 	{
-		*(char*)(0xb8000 + *curs) = c;
-		*(char*)(0xb8001 + *curs) = color;
-		*curs += 2;
-		*curs %= 2 * 80 * 25;
+		*(char*)(0xb8000 + (2 * (*curs))) = c;
+		*(char*)(0xb8001 + (2 * (*curs))) = color;
+		(*curs)++;
+		// *curs %= 80 * 25;
 	}
 }
 
 void putc(uint16_t c)
 {
-	putchar((c & 0xff), 0x0f, &cursor);
+	putchar((c & 0xff), 0x0f, &text_cursor);
 }
 
 bool kbhit()
@@ -118,10 +116,10 @@ char* gets(uint16_t MAX_STR_SIZE)
 						if(i > 0)
 						{
 							i--;
-							cursor -= 2;
+							text_cursor--;
 							putc(' ');
 							str[i] = ' ';
-							cursor -= 2;
+							text_cursor--;
 						}
 					}
 					else if(c != '\n')
@@ -131,7 +129,7 @@ char* gets(uint16_t MAX_STR_SIZE)
 							putc(c);
 							str[i] = c;
 
-							// cursor -= 2;
+							// text_cursor -= 2;
 
 							i++;
 						}
@@ -158,11 +156,11 @@ char* gets(uint16_t MAX_STR_SIZE)
 	return str;
 }
 
-void printstr(const char* str, uint8_t color, uint16_t* cursor)
+void printstr(const char* str, uint8_t color, uint16_t* text_cursor)
 {
 	for(uint32_t i = 0; str[i] != '\0'; i++)
 	{
-		putchar(str[i], color, cursor);
+		putchar(str[i], color, text_cursor);
 	}
 }
 
@@ -281,7 +279,7 @@ int32_t atoi(char* str)
 
 void puts(char* str)
 {
-	printstr(str, 0x0f, &cursor);
+	printstr(str, 0x0f, &text_cursor);
 }
 
 char hex4bToChar(uint8_t hex)
