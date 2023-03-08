@@ -1,5 +1,7 @@
 # HorizonOS
 A hobby 32 bit/legacy BIOS OS for x86 processors
+
+![alt text](https://github.com/SomeRandomOSDev/HorizonOS/blob/main/Screenshots/screen1.png?raw=true)
  
 #
 HorizonOS is a work in progress 32-bit operating system written from scratch <br />
@@ -10,7 +12,9 @@ Ressources I used to learn OS Development :
  
 ## Features 
 
-- PS/2 Keyboard Driver
+- Interrupt Handlers
+	- Timer
+	- PS/2 Keyboard Driver
 - Parallel Ports Driver
 - APM Support
 - Memory Manager
