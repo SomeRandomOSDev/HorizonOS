@@ -64,8 +64,9 @@ void PCI_CheckDevice(uint8_t bus, uint8_t device, uint8_t fonction, uint8_t* fun
     }
 }
 
-void PCI_ScanBuses()
+void PCI_ScanBuses(uint16_t* devices)
 {
+    *devices = 0;
     for(uint16_t i = 0; i < 256; i++)
 	{
 		for(uint8_t j = 0; j < 32; j++)
@@ -80,6 +81,9 @@ void PCI_ScanBuses()
                 PCI_CheckDevice(i, j, k, &func, &deviceId, &vendorId, &pciClass, &headerType, &subVendorId, &subDeviceId);
                 // switch(vendorId)
                 // {
+                // case 0x1002:
+                //     vendorStr = "AMD";
+                //     break;
                 // case 0x1234:
                 //     vendorStr = "Technical Corp.";
                 //     // deviceStr = "QEMU Virtual Video Controller";
@@ -176,7 +180,28 @@ void PCI_ScanBuses()
                     break;
                 }
                 if(deviceId != 0xffff)
+                {
+                    (*devices)++;
                     printf("%x:%x.%x %x: %x:%x %x:%x | %s\n", i, j, k, pciClass, vendorId, deviceId, subVendorId, subDeviceId, classStr);
+                }
+
+                if(pciClass == 0x0403)
+                {
+                    if(vendorId == 0x8086)
+                    {
+                        if(deviceId == 0x2668 || deviceId == 0x27d8)
+                        {
+                            intelHDA_connected = true;
+                        }
+                    }
+                    else if(vendorId == 0x1002)
+                    {
+                        if(deviceId == 0x4383)
+                        {
+                            intelHDA_connected = true;
+                        }
+                    }
+                }
             }
 		}
 	}

@@ -8,6 +8,15 @@ struct IDTRegisters
     uint32_t eip, cs, eflags, userEsp, ss;
 } __attribute__((packed));
 
+typedef enum 
+{
+	PCSpeaker,
+	SoundBlaster16,
+	IntelHDA
+} AudioOutput;
+
+AudioOutput audio_out;
+
 #define KB 1024
 #define MB (1024 * KB)
 #define GB (1024 * MB)
@@ -75,6 +84,7 @@ void KeyboardHandler(struct IDTRegisters* reg);
 #include "Drivers/serial.h"
 #include "Drivers/Sound/pcspk.h"
 #include "Drivers/Sound/sb16.h"
+#include "Drivers/Sound/intelhda.h"
 
 #include "Util/io.c"
 #include "Util/util.c"
@@ -158,7 +168,7 @@ void init2()
 
 	printf("%u bytes found.\n", RAM_SIZE);
 
-	printf("EBDA adress : 0x%x\n", EBDAAddress);
+	// printf("EBDA adress : 0x%x\n", EBDAAddress);
 
 	puts("Initialysing keyboard...\n");
 
@@ -177,8 +187,8 @@ void init2()
 		SetScancodeSet(2);
 	}
 
-	printf("PATA Slave Drive Identify :  %xh (%s)\n", ATAIdentify(ATA_DISK_SLAVE), (ATAIdentify(ATA_DISK_SLAVE) == 0 ? "Disconnected" : "Connected"));
-	printf("PATA Master Drive Identify : %xh (%s)\n", ATAIdentify(ATA_DISK_SLAVE), (ATAIdentify(ATA_DISK_MASTER) == 0 ? "Disconnected" : "Connected"));
+	// printf("PATA Slave Drive Identify :  %xh (%s)\n", ATAIdentify(ATA_DISK_SLAVE), (ATAIdentify(ATA_DISK_SLAVE) == 0 ? "Disconnected" : "Connected"));
+	// printf("PATA Master Drive Identify : %xh (%s)\n", ATAIdentify(ATA_DISK_SLAVE), (ATAIdentify(ATA_DISK_MASTER) == 0 ? "Disconnected" : "Connected"));
 
 	updateCursor();
 
@@ -236,8 +246,32 @@ void init2()
 
 	ClearScreen();
 
+	intelHDA_connected = false;
+
+	uint16_t devicesNb;
 	printf("Scanning PCI Buses...\n\n");
-	PCI_ScanBuses();
+	PCI_ScanBuses(&devicesNb);
+	printf("\n%u devices found.\n\n", devicesNb);
+
+	updateCursor();
+
+	// Halt();
+
+	ClearScreen(); /////////////////////////////////////////// Audio
+
+	audio_out = PCSpeaker;
+
+	if(SB16_IsConnected())
+	{
+		audio_out = SoundBlaster16;
+		printf("Sound Blaster 16 connected !\n");
+	}
+
+	if(IntelHDA_IsConnected())
+	{
+		audio_out = IntelHDA;
+		printf("Intel High Definition Audio device connected !\n");
+	}
 
 	updateCursor();
 
